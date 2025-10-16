@@ -1,0 +1,34 @@
+.weather{
+    place-self: center;
+    padding: 40px;
+    border-radius: 10px;
+    background-image: linear-gradient(45deg, #00ffc8, #0062b3);
+    display: flex;
+    align-items: center;
+}
+
+.search-bar{
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.search-bar input{
+    height: 50px;
+    border: none;
+    outline: none;
+    border-radius: 40px;
+    padding-left: 25px;
+    color: #626262;
+    background: #ffffff;
+    font-size: 18px;
+}
+
+.search-bar img {
+    width: 50px;
+    height: 50px;
+    padding: 15px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+}
