@@ -13,6 +13,11 @@
     gap: 30px;
 }
 
+.search-bar button{
+    background-color: #00000000;
+    border: none;
+}
+
 .search-bar input{
     height: 50px;
     border: none;
@@ -31,4 +36,48 @@
     border-radius: 50%;
     background: #ffffff;
     cursor: pointer;
+}
+
+
+.weather-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.pollen-buttons, .skin-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pollen-btn, .skin-btn {
+  width: 80px;
+  height: 80px;
+  font-size: 14px;
+  border-radius: 12px;
+  border-style: solid;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.pollen-btn.selected, .skin-btn.selected {
+  border-color: #4caf50;
+  border-width: 7px;
+  color: black;
+}
+
+.submit-btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  background-color: #2196f3;
+  color: white;
 }

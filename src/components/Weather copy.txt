@@ -1,0 +1,214 @@
+import React, { useState, useEffect } from "react"
+import { gql } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client/react";
+
+import "./Weather.css"
+import search_icon from "../assets/search.png"
+
+import { useUserId } from "../hooks/useUserId";
+import { useMutation, useQuery } from "@apollo/client/react";
+import { SAVE_USER_PREFERENCES, FETCH_USER_PREFERENCES } from "../graphql/weather";
+
+const GET_WEATHER = gql`
+  query GetWeather(
+    $city: String!,
+    $duration: Int!,
+    $pollenLevel: String!,
+    $skinType: String!
+  ) {
+    weather(
+      city: $city,
+      duration: $duration,
+      pollenLevel: $pollenLevel,
+      skinType: $skinType
+    ) {
+      city
+      temperature
+      feelsLike
+      humidity
+      condition
+      cloudCover
+      uv
+      airQuality
+      recommendation
+    }
+  }
+`;
+
+// TypeScript type for response
+interface InputVariables {
+  city: string;
+  duration: number;
+  pollenLevel: string;
+  skinType: string;
+}
+
+interface WeatherResponse {
+  weather: {
+    city: string;
+    temperature: number;
+    feelsLike: number;
+    humidity: number;
+    condition: string;
+    cloudCover: number;
+    uv: number;
+    airQuality: number;
+    recommendation: string;
+  };
+}
+
+interface UserPreferences {
+  uuid: string;
+  city: string;
+  duration: number;
+  skinType: string;
+}
+
+interface FetchUserPreferencesResponse {
+  fetchUserPreferences: UserPreferences;
+}
+
+interface FetchUserPreferencesVariables {
+  userId: string;
+}
+
+const userUuid = localStorage.getItem("user_uuid");
+
+const { data } = useQuery(FETCH_USER_PREFERENCES, {
+  variables: { userUuid },
+  skip: !userUuid, // only run if we have a UUID
+});
+
+
+const Weather: React.FC = () => {
+  const [city, setCity] = useState<string>("")
+  const [duration, setDuration] = useState<number>(15)
+  const [pollenLevel, setPollenLevel] = useState<"None" | "Light" | "Mild" | "Severe">("None");
+  const [skinType, setSkinType] = useState<"I" | "II" | "III" | "IV" | "V" | "VI">("III");
+  
+  const userId = useUserId();
+
+  const [getWeather, { loading, error, data }] = useLazyQuery<WeatherResponse, InputVariables>(GET_WEATHER);
+  
+  
+   // 🚀 NEW: Fetch saved preferences
+  const { data: savedPrefsData } = useQuery<
+    FetchUserPreferencesResponse,
+    FetchUserPreferencesVariables
+  >(FETCH_USER_PREFERENCES, {
+    variables: { userId },
+    skip: !userId,
+  });
+
+  
+
+  // Prefill form when data loads
+   useEffect(() => {
+    if (savedPrefsData?.fetchUserPreferences) {
+      const { city, duration, skinType } = savedPrefsData.fetchUserPreferences;
+      setCity(city);
+      setDuration(duration);
+      setSkinType(skinType as any);
+    }
+  }, [savedPrefsData]);
+
+  const [savePrefs] = useMutation(SAVE_USER_PREFERENCES);
+
+  const handleSubmit = async () => {
+    if (!city || !duration || !pollenLevel || !skinType) {
+      alert("Please fill out all fields!");
+    return;
+    }
+
+    let userId = localStorage.getItem("user_id") || crypto.randomUUID();
+    localStorage.setItem("user_id", userId);
+
+    // Save preferences
+    await savePrefs ({
+      variables: { input: { userUuid: localStorage.getItem("user_uuid"), city, duration, skinType } },
+    });
+
+    getWeather({
+      variables: { city, duration, pollenLevel, skinType }
+    });
+
+    console.log({ userId, city, duration, pollenLevel, skinType });
+  };
+
+  return (
+    <div className = "weather">
+
+    <div className="weather-container">
+      <input 
+        type="text" 
+        placeholder="City" 
+        value={city} 
+        onChange={e => setCity(e.target.value)} 
+      />
+      <input 
+        type="number" 
+        placeholder="Run duration" 
+        value={duration} 
+        onChange={e => setDuration(Number(e.target.value))} 
+        min={1} 
+        max={60} 
+      />
+      
+      <div className="pollen-buttons">
+        {["None", "Light", "Mild", "Severe"].map(level => (
+          <button
+            key={level}
+            className={`pollen-btn ${pollenLevel === level ? "selected" : ""}`}
+            onClick={() => setPollenLevel(level as any)}
+            
+          >
+            {level}
+          </button>
+        ))}
+      </div>
+
+      <div className="skin-buttons">
+        {["I", "II", "III", "IV", "V", "VI"].map(num => (
+          <button
+            key={num}
+            className={`skin-btn ${skinType === num ? "selected" : ""}`}
+            onClick={() => setSkinType(num as any)}
+          >
+            {num}
+          </button>
+        ))}
+      </div>
+
+      <button className="submit-btn" onClick={() => handleSubmit()}>
+        Submit
+      </button>
+
+      
+      </div>
+
+      <div>
+        {loading && <p>Loading...</p>}
+          {error && <p>Error: {error.message}</p>}
+
+          {data && data.weather && (
+            <div className="weather-results">
+              <h2>{data.weather.city}</h2>
+              <p>Condition: {data.weather.condition}</p>
+              <p>Temp: {data.weather.temperature}°C</p>
+              <p>Feels like: {data.weather.feelsLike}°C</p>
+              <p>Humidity: {data.weather.humidity}%</p>
+              <p>Cloud Cover: {data.weather.cloudCover}%</p>
+              <p>UV Index: {data.weather.uv}</p>
+              <p>Air Quality: {data.weather.airQuality}</p>
+              <p>Recommendation: {data.weather.recommendation}</p>
+            </div>
+          )}
+
+      </div>
+
+      
+    </div>
+  )
+}
+
+export default Weather;

@@ -3,7 +3,17 @@
 module Types
   class QueryType < Types::BaseObject
     
-    
+    field :weather, Types::WeatherType, null: false do
+      argument :city, String, required: true
+      argument :duration, Int, required: true
+      argument :skin_type, String, required: true
+    end
+
+    def weather(city:, duration:, skin_type:)
+      raw_data = WeatherFetcher.new(city).call
+      WeatherAnalyzer.new(raw_data, duration, skin_type).analyze
+    end
+
     field :node, Types::NodeType, null: true, description: "Fetches an object given its ID." do
       argument :id, ID, required: true, description: "ID of the object."
     end
@@ -23,29 +33,11 @@ module Types
     # Add root-level fields here.
     # They will be entry points for queries on your schema.
 
-    
-    field :weather, Types::WeatherType, null: false do
-      argument :city, String, required: true
-      argument :duration, Int, required: true
-      argument :pollen_level, String, required: false
-      argument :skin_type, String, required: true
+    # TODO: remove me
+    field :test_field, String, null: false,
+      description: "An example field added by the generator"
+    def test_field
+      "Hello World!"
     end
-
-    def weather(city:, duration:, pollen_level:, skin_type:)
-      raw_data = WeatherFetcher.new(city).call
-      analyzed = WeatherAnalyzer.new(raw_data, duration, pollen_level, skin_type).analyze
-
-      #Save user data to database
-      last_pref = RunPreference.first_or_initialize
-      last_pref.update(city: city, duration: duration, skin_type: skin_type)
-
-      #Return analyzed data
-      analyzed
-
-    end
-
-
-    field :fetch_user_preferences, resolver: Queries::FetchUserPreferences
-
   end
 end

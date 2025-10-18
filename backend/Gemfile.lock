@@ -103,6 +103,8 @@ GEM
       raabro (~> 1.4)
     globalid (1.3.0)
       activesupport (>= 6.1)
+    graphiql-rails (1.10.5)
+      railties
     graphql (2.5.14)
       base64
       fiber-storage
@@ -332,6 +334,7 @@ DEPENDENCIES
   bootsnap
   brakeman
   debug
+  graphiql-rails
   graphql (~> 2.5)
   httparty
   kamal
