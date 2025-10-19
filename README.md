@@ -11,9 +11,10 @@ A web app that helps runners determine if it's ideal to go on a run at the momen
 
 ## Tech Stack
 
-Frontend: React, Typescript
+<b>Frontend:</b> React, Typescript
 
-Backend: Ruby on Rails, GraphQL
+<b>Backend:</b> Ruby on Rails, GraphQL
 
-Database: PostgreSQL
+<b>Database:</b> PostgreSQL
+
 
