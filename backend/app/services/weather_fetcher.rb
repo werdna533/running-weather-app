@@ -1,4 +1,3 @@
-# app/services/weather_fetcher.rb
 class WeatherFetcher
   include HTTParty
 
@@ -28,6 +27,11 @@ class WeatherFetcher
     weather_data = weather_response.parsed_response
     aq_data = aq_response.parsed_response
     uv_data = uv_response.parsed_response
+
+    puts "Geo data: #{geo_response.parsed_response.inspect}"
+    puts "Weather data: #{weather_response.parsed_response.inspect}"
+    puts "AQ data: #{aq_response.parsed_response.inspect}"
+    puts "UV data: #{uv_response.parsed_response.inspect}"
 
     {
       city: weather_data["name"] || @city,

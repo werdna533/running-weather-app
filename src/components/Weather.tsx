@@ -4,7 +4,7 @@ import { useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
 import "./Weather.css";
 
 import { SAVE_USER_PREFERENCES, FETCH_USER_PREFERENCES } from "../graphql/weather";
-import { useUserId } from "../hooks/useUserId";
+//import { useUserId } from "../hooks/useUserId";
 
 // GraphQL Types
 interface WeatherResponse {
@@ -28,13 +28,13 @@ interface InputVariables {
   skinType: "I" | "II" | "III" | "IV" | "V" | "VI";
 }
 
-interface UserPreferences {
+/*interface UserPreferences {
   uuid: string;
   city: string;
   duration: number;
   skinType: "I" | "II" | "III" | "IV" | "V" | "VI";
 }
-
+*/
 interface FetchUserPreferencesResponse {
   fetchUserPreferences: {
     uuid: string;
@@ -76,7 +76,7 @@ const Weather: React.FC = () => {
   const [skinType, setSkinType] = useState<"I" | "II" | "III" | "IV" | "V" | "VI">("III");
 
   // User ID
-  const userId = useUserId();
+ // const userId = useUserId();
   const userUuid = localStorage.getItem("user_uuid") || crypto.randomUUID();
   localStorage.setItem("user_uuid", userUuid);
 
@@ -98,7 +98,7 @@ const Weather: React.FC = () => {
       setDuration(preferences.duration);
       setSkinType(preferences.skinType as any);
 
-      getWeather({ variables: { city, duration, pollenLevel, skinType } });
+      //getWeather({ variables: { city, duration, pollenLevel, skinType } });
     }
   }, [savedPrefsData]);
 
